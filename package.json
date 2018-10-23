@@ -1,0 +1,24 @@
+{
+  "name": "gaoyakun.github.io",
+  "version": "0.1.0",
+  "description": "gaoyakun's blog",
+  "main": "index.js",
+  "dependencies": {
+    "hexo-server": "^0.2.2",
+    "jekyll": "^3.0.0-beta1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gaoyakun/gaoyakun.github.io.git"
+  },
+  "author": "gaoyakun",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gaoyakun/gaoyakun.github.io/issues"
+  },
+  "homepage": "https://github.com/gaoyakun/gaoyakun.github.io#readme"
+}
