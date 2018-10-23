@@ -3,7 +3,8 @@ layout:     post
 title:      线段树
 date:       2018-10-23
 author:     GaoYakun
-catalog: true
+catalog:    true
+mathjax:    true
 tags:
     - 线段树
 ---
