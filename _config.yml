@@ -66,6 +66,9 @@ tag_dir: tag/
 excerpt_separator: "\n\n\n\n"
 
 # paginate
-plugins: [jekyll-paginate]
+plugins: [jekyll-paginate, jekyll-mermaid]
 paginate: 6
 port: 4001
+
+mermaid:
+  src: 'js/mermaid.min.js'
