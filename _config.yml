@@ -7,7 +7,7 @@
 
 # Site settings
 title: "GYK的算法小屋"
-brief-intro: "System Research"
+brief-intro: "c++算法资料"
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://gaoyakun.github.io" # the base hostname & protocol for your site
 
