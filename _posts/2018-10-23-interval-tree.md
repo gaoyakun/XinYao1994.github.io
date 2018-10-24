@@ -5,6 +5,7 @@ date:       2018-10-23
 author:     GaoYakun
 catalog:    true
 mathjax:    true
+mermaid:    true
 tags:
     - 线段树
 ---
