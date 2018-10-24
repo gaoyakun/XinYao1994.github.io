@@ -2,6 +2,11 @@
 layout: default
 ---
 
+{% if page.mermaid %}
+    <link rel="stylesheet" href="/css/mermaid.css">
+    <script src="/js/mermaid.min.js"></script>
+{% endif %}
+
 <div class="page clearfix" post>
     <div class="left">
         <h1>{{page.title}}</h1>
