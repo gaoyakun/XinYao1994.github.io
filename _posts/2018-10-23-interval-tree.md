@@ -7,7 +7,9 @@ catalog:    true
 mathjax:    true
 mermaid:    true
 tags:
-    - 算法 数据结构 线段树
+    - 算法
+    - 数据结构
+    - 线段树
 ---
 
 ## <center>线段树</center>
