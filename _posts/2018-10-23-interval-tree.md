@@ -3,11 +3,11 @@ layout:     post
 title:      线段树
 date:       2018-10-23
 author:     GaoYakun
+category:   数据结构
 catalog:    true
 mathjax:    true
 mermaid:    true
 tags:
-    - 算法
     - 数据结构
     - 线段树
 ---
