@@ -64,7 +64,6 @@ int calcArea (RootNode, rect[N]) {
   using std::endl;
   using std::vector;
   
-  #define MAX_RECTS 100
   #define MAX_DIM 10000
   
   /** 定义矩形结构
