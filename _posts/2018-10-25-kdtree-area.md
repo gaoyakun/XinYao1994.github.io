@@ -56,8 +56,6 @@ int calcArea (RootNode, rect[N]) {
   ``` c++
   #include <iostream>
   #include <vector>
-  #include <ctime>
-  #include <cstdlib>
   
   using std::cin;
   using std::cout;
