@@ -64,6 +64,7 @@ void dfs (int vertex) {
  */
 void topologicSort () {
     memset (vis, 0, sizeof(vis));
+    topologicCount = 0;
     for (int i = 1; i <= numVertices; i++) {
         dfs (i);
     }
