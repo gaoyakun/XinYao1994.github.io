@@ -71,22 +71,22 @@ void topologicSort () {
 
 int main () {
     // 读入顶点数
-	cin >> numVertices;
+    cin >> numVertices;
     // 读入邻接矩阵
-	for (int i = 1; i <= numVertices; i++) {
-		for (int j = 1; j <= numVertices; j++) {
-			cin >> adjMatrix[i][j];
-		}
-	}
+    for (int i = 1; i <= numVertices; i++) {
+        for (int j = 1; j <= numVertices; j++) {
+            cin >> adjMatrix[i][j];
+        }
+    }
     
     // 拓扑排序
-	topologicSort ();
+    topologicSort ();
     
     // 打印拓扑次序
-	for (int i = 0; i < topologicCount; i++) {
-		cout << topologicSortArray[i] << " ";
-	}
-	return 0;
+    for (int i = 0; i < topologicCount; i++) {
+	    cout << topologicSortArray[i] << " ";
+    }
+    return 0;
 }
 ```
 
