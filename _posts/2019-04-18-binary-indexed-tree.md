@@ -3,7 +3,7 @@ layout:     post
 title:      树状数组(二叉索引树)
 date:       2019-04-18
 author:     GaoYakun
-category:   算法
+category:   数据结构
 catalog:    true
 mathjax:    true
 mermaid:    true
