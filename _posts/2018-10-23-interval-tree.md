@@ -71,8 +71,8 @@ tags:
     intervaltree.hpp
   	线段树的代码实现
   **********************************************************/
-  #ifndef __SEGMENT_TREE__
-  #define __SEGMENT_TREE__
+  #ifndef __INTERVAL_TREE__
+  #define __INTERVAL_TREE__
 
   #include <vector>
 
@@ -86,7 +86,7 @@ tags:
 
   // 求和的Traits模板
   template <class T>
-  struct SegmentTreeTraits_Sum {
+  struct IntervalTreeTraits_Sum {
       T combine (const T &a, const T &b) const {
           return a + b;
       }
@@ -103,7 +103,7 @@ tags:
 
   // 求最大值的Traits模板
   template <class T>
-  struct SegmentTreeTraits_Max {
+  struct IntervalTreeTraits_Max {
       T combine (const T &a, const T &b) const {
           return a > b ? a : b;
       }
@@ -120,7 +120,7 @@ tags:
 
   // 求最小值的Traits模板
   template <class T>
-  struct SegmentTreeTraits_Min {
+  struct IntervalTreeTraits_Min {
       T combine (const T &a, const T &b) const {
           return a < b ? a : b;
       }
@@ -136,8 +136,8 @@ tags:
   };
 
   // 线段树模板
-  template <class T, class Traits = SegmentTreeTraits_Sum<T> >
-  class SegmentTree {
+  template <class T, class Traits = IntervalTreeTraits_Sum<T> >
+  class IntervalTree {
       mutable vector<T> C;
       mutable vector<T> f;
       Traits traits;
@@ -214,7 +214,7 @@ tags:
           }
       }
   };
-  #endif //__SEGMENT_TREE__
+  #endif // __INTERVAL_TREE__
 
   ```
 
