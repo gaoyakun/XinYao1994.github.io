@@ -73,5 +73,88 @@ $$
 
 &emsp;&emsp;根据公式$7$可以看出，我们可以通过两个$D_k$和$kD_k$两个差分序列来方便地求出原数组的前缀和，进而实现区间查询。
 
+- ### 完整代码
 
+  ``` c++
+  /*******************************************************
+    bit.hpp
+	以下代码实现了支持区间修改，区间查询的树状数组
+  ********************************************************/
+  #ifndef __BINARY_INDEXED_TREE__
+  #define __BINARY_INDEXED_TREE__
+
+  #include <vector>
+  
+  // BaseBIT类只支持单点修改
+  template <class T>
+  class BaseBIT {
+      std::vector<T> C;
+  public:
+      // 初始化树状数组为n个零，
+      void init (size_t n) {
+          C.resize (n + 1, 0);
+      }
+      // 获取元素个数
+      size_t count () const {
+          return C.size() - 1;
+      }
+      // 单点修改，给pos位置的元素增加d
+      void singleAdd (size_t pos, T d) {
+          size_t count = C.size();
+          while (pos <= count) {
+              C[pos] += d;
+              pos += pos & -pos;
+          }
+      }
+      // 获取前n个元素的前缀和
+      T sum (size_t n) const {
+          T result = 0;
+          while (n) {
+              result += C[n];
+              n -= n & -n;
+          }
+          return result;
+      }
+      // 区间查询，获取[posStart, posEnd]区间的元素之和
+      T rangeQuery (size_t posStart, size_t posEnd) const {
+          return sum(posEnd) - sum(posStart-1);
+      }
+  };
+
+  // BIT类支持区间修改和区间查询，性能优于线段树
+  // 内部维护两个基本树状数组
+  template <class T>
+  class BIT {
+      BaseBIT<T> baseBIT1;
+      BaseBIT<T> baseBIT2;
+  public:
+      // 初始化树状数组为n个零，
+      void init (size_t size) {
+          baseBIT1.init(size);
+          baseBIT2.init(size);
+      }
+      // 获取元素个数
+      size_t count () const {
+          return baseBIT1.count();
+      }
+      // 区间修改，给[posStart, posEnd]区间的元素都增加d
+      void rangeAdd (size_t posStart, size_t posEnd, T d) {
+          baseBIT1.singleAdd (posStart, d);
+          baseBIT1.singleAdd (posEnd+1, -d);
+          baseBIT2.singleAdd (posStart, d * posStart);
+          baseBIT2.singleAdd (posEnd+1, -d * (posEnd+1));
+      }
+      // 获取前n个元素的前缀和
+      T sum (size_t n) const {
+          return (n + 1) * baseBIT1.sum(n) - baseBIT2.sum(n);
+      }
+      // 区间查询，获取[posStart, posEnd]区间的元素之和
+      T rangeQuery (size_t posStart, size_t posEnd) const {
+          return sum (posEnd) - sum (posStart-1);
+      }
+  };
+  #endif // __BINARY_INDEXED_TREE__
+```
+
+  
 

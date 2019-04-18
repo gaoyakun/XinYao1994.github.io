@@ -67,220 +67,155 @@ tags:
 - ### 代码
 
   ``` c++
-  /**************************************************************************
-  	本代码演示如何利用线段树对线性数组区间修改,区间求和
-  	所有数组下标由1开始
-  	使用二叉树的数组存储方式来保存线段树的数据,对于线段K,其左右孩子为K*2和K*2+1
-  ***************************************************************************/
-  #include <stdio.h>
-  
-  // 元素的数量
-  #define N_NUMBERS 1000
-  // 线段树节点数组的大小，设为4N
-  #define N_NODES (4*N_NUMBERS)
-  
-  int num[N_NUMBERS+1]; // 存放线性结构数据（非必需，在这里仅对拍用）
-  
-  /**************************************************************************
-  下面是线段树数据，为二叉树的数组存储模式，以下采用多个数组形石，也可使用struct。*/
-  int sum[N_NODES];//存放每个线段求和的结果
-  int inc[N_NODES];// 存放每个线段的修改增量标记
-  /*************************************************************************/
-  
-  /** 初始化线性数组为1到N_NUMBERS
-   */
-  void numbers_init () {
-      for (int i = 1; i <= N_NUMBERS; i++) {
-          num[i] = i;
-      }
-  }
-  
-  /** 利用递归的方式创建线段树
-   * @param node 要创建的线段，该值为二叉树索引，下面的函数均相同
-   * @param l 该线段的左端点，该值为线性数组索引，下面的函数均相同
-   * @param r 该线段的右端点，该值为线性数组索引，下面的函数均相同
-   */
-  void tree_init_recursive (int node, int l, int r) {
-      if (l == r) {
-          // 左右端点相同的线段为叶子，设置求和结果为该元素的值
-          sum[node] = num[l];
-      } else {
-          // 不是叶子
-          // 递归创建左右子线段
-          int mid = (l + r) / 2;
-          tree_init_recursive (node * 2, l, mid);
-          tree_init_recursive (node * 2 + 1, mid + 1, r);
-          // 根据子线段的求和结果更新自己的求和结果
-          sum[node] = sum[node * 2] + sum[node * 2 + 1];
-      }
-      // 清除增量标记
-      inc[node] = 0;
-  }
-  
-  /** 创建线段树的非递归包装 
-   */
-  void tree_init () {
-      tree_init_recursive (1, 1, N_NUMBERS);
-  }
-  
-  /** 利用递归的方式求某一线段的元素和
-   * @param node 同上
-   * @param l 同上
-   * @param r 同上
-   * @param L 要求和的区间的左端点，线性数组索引
-   * @param R 要求和的区间的右端点，线性数组索引
-   * @return 该线段的元素之和
-   */
-  int tree_get_sum_recursive (int node, int l, int r, int L, int R) {
-      if (L <= l && R >= r) {
-          //该线段完全落入区间内，直接返回该线段的和
-          return sum[node];
-      } else {
-          //线段和区间相交，分别递归左右子线段求和
-          int mid = (l + r) / 2;
-          //注意：先检查本线段的增量标记，如果有增量需要将该增量传播到子线段
-          if (inc[node]) {
-              // 更新左子线段的和和增量标记
-              sum[node * 2] += (mid - l + 1) * inc[node];
-              inc[node * 2] += inc[node];
-              // 更新右子线段的和和增量标记
-              sum[node * 2 + 1] += (r - mid) * inc[node];
-              inc[node * 2 + 1] += inc[node];
-              // 清除自己的增量标记
-              inc[node] = 0;
-          }
-          //递归求子线段的和
-          int result = 0;
-          if (L <= mid) {
-              // 和左子线段相交，计算之
-              result += tree_get_sum_recursive (node * 2, l, mid, L, R);
-          }
-          if (R > mid) {
-              // 和右子线段相交，计算之
-              result += tree_get_sum_recursive (node * 2 + 1, mid + 1, r, L, R);
-          }
-          return result;
-      }
-  }
-  
-  /** 递归求和的非递归包装 
-   * @param L 同上
-   * @param R 同上
-   * @return 同上
+  /**********************************************************
+    intervaltree.hpp
+  	线段树的代码实现
+  **********************************************************/
+  #ifndef __SEGMENT_TREE__
+  #define __SEGMENT_TREE__
+
+  #include <vector>
+
+  /**
+    这里利用Traits模板来自定义线段树的实现。
+    combine方法定义了如何合并左右孩子节点
+    combineLeft定义了只有左孩子时候的合并方法
+    combineRight定义了只有右孩子时候的合并方法
+    update定义了当某节点区间内的元素增加时如何更新节点值
   */
-  int tree_get_sum (int L, int R) {
-      return tree_get_sum_recursive (1, 1, N_NUMBERS, L, R);
-  }
-  
-  /** 求和的朴素算法，用于对拍
-   * @param L 同上
-   * @param R 同上
-   * @return 同上
-   */
-  int brute_force_get_sum (int L, int R) {
-      int result = 0;
-      for (int i = L; i <= R; i++) {
-          result += num[i];
+
+  // 求和的Traits模板
+  template <class T>
+  struct SegmentTreeTraits_Sum {
+      T combine (const T &a, const T &b) const {
+          return a + b;
       }
-      return result;
-  }
-  
-  /** 利用递归修改区间的值
-   * @param node 同上
-   * @param l 同上
-   * @param r 同上
-   * @param L 要修改的区间的左端点，线性数组索引
-   * @param R 要修改的区间的右端点，线性数组索引
-   * @param value 要修改区间内每个元素的增量
-   */
-  void tree_inc_recursive(int node, int l, int r, int L, int R, int value) {
-      if (L <= l && R >= r) {
-          /*  该线段完全落入修改区间之内，根据增量修正区间的和，并记录增量标记
-          	之所以要记录标记是因为我们我们的子线段的和并未修正，出于不正确的状态。
-          	如果递归更新所有子线段的和就等于又回到了O(N)的复杂度，没有意义。
-          	所以我们在这里通过增量标记进行记录，等查询的时候发现了有标记，就根据标记
-          	更新子线段并清除标记。
-          	下面使用+=进行自增，是为了在本线段原来已经有增量标记的情况下也不出问题。
-          */
-          sum[node] += (r - l + 1) * value;
-          inc[node] += value;
-      } else {
-          /* 该线段和修改区间相交，需要先把增量标记传播到子线段，再递归进行修改 */
-          int mid = (l + r) / 2;
-          sum[node * 2] += (mid - l + 1) * inc[node];
-          inc[node * 2] += inc[node];
-          sum[node * 2 + 1] +=(R - mid) * inc[node];
-          inc[node * 2 + 1] += inc[node];
-          inc[node] = 0;
-          if (L <= mid) {
-              //区间和左子线段相交，处理左子线段
-              tree_inc_recursive (node * 2, l, mid, L, R, value);
+      T combineLeft (const T &a) const {
+          return a;
+      }
+      T combineRight (const T &a) const {
+          return a;
+      }
+      T update (const T &a, const T &delta, size_t num) const {
+          return a + delta * num;
+      }
+  };
+
+  // 求最大值的Traits模板
+  template <class T>
+  struct SegmentTreeTraits_Max {
+      T combine (const T &a, const T &b) const {
+          return a > b ? a : b;
+      }
+      T combineLeft (const T &a) const {
+          return a;
+      }
+      T combineRight (const T &a) const {
+          return a;
+      }
+      T update (const T &a, const T &delta, size_t num) const {
+          return a + delta;
+      }
+  };
+
+  // 求最小值的Traits模板
+  template <class T>
+  struct SegmentTreeTraits_Min {
+      T combine (const T &a, const T &b) const {
+          return a < b ? a : b;
+      }
+      T combineLeft (const T &a) const {
+          return a;
+      }
+      T combineRight (const T &a) const {
+          return a;
+      }
+      T update (const T &a, const T &delta, size_t num) const {
+          return a + delta;
+      }
+  };
+
+  // 线段树模板
+  template <class T, class Traits = SegmentTreeTraits_Sum<T> >
+  class SegmentTree {
+      mutable vector<T> C;
+      mutable vector<T> f;
+      Traits traits;
+  public:
+      // 初始化线段树为n个零
+      void init (size_t n) {
+          C.resize (n * 4, 0);
+          f.resize (n * 4, 0);
+      }
+      // 获取元素个数
+      size_t count () const {
+          return C.size() / 4;
+      }
+      // 区间修改，给[posStart,posEnd]区间内的元素都增加d
+      void rangeAdd (size_t posStart, size_t posEnd, T d) {
+          rangeAdd_r (1, 1, C.size()/4, posStart, posEnd, d);
+      }
+      // 区间查询，获取[posStart,posEnd]区间内的元素之和
+      T rangeQuery (size_t posStart, size_t posEnd) const {
+          return rangeQuery_r (1, 1, C.size()/4, posStart, posEnd);
+      }
+  private:
+      void rangeAdd_r (size_t node, size_t l, size_t r, size_t L, size_t R, T d) {
+          if (L <= l && R >= r) {
+              C[node] = traits.update(C[node], d, r - l + 1);
+              f[node] += d;
+          } else {
+              size_t mid = (l + r) / 2;
+              if (f[node]) {
+                  C[node*2] = traits.update(C[node*2], f[node], mid - l + 1);
+                  f[node*2] += f[node];
+                  C[node*2+1] = traits.update(C[node*2+1], f[node], r - mid);
+                  f[node*2+1] += f[node];
+                  f[node] = 0;
+              }
+              if (L <= mid) {
+                  rangeAdd_r (node*2, l, mid, L, R, d);
+              }
+              if (R > mid) {
+                  rangeAdd_r (node*2+1, mid+1, r, L, R, d);
+              }
+              C[node] = traits.combine(C[node*2], C[node*2+1]);
           }
-          if (R > mid) {
-              //区间和右子线段相交，处理右子线段
-              tree_inc_recursive (node * 2 + 1, mid + 1, r, L, R, value);
-          }
-          //根据左右子线段的和更新自己的和
-          sum[node] = sum[node * 2] + sum[node * 2 + 1];
       }
-  }
-  
-  /** 区间修改的非递归包装 
-   * @param L 同上
-   * @param R 同上
-   * @param value 同上
-   */
-  void tree_inc (int L, int R, int value) {
-  	tree_inc_recursive (1, 1, N_NUMBERS, L, R, value);    
-  }
-  
-  /** 区间修改的朴素版本 
-   * @param L 同上
-   * @param R 同上
-   * @param value 同上
-   */
-  void brute_force_inc (int L, int R, int value) {
-      for (int i = L; i <= R; i++) {
-          num[i] += value;
-      }
-  }
-  
-  /** 下面是个测试函数，用线段树版本和朴素版本对拍来测试算法是否正确
-   * 该函数将测试每一种可能的区间分布。
-   * @return 返回true表示测试成功，返回false表示测试失败，有BUG
-   */
-  bool test_get_sum () {
-      for (int i = 1; i < N_NUMBERS; i++) {
-          for (int j = i + 1; j <= N_NUMBERS; j++) {
-              int a = tree_get_sum (i, j);
-              int b = brute_force_get_sum (i, j);
-              if (a != b) {
-                  // 失败
-                  printf ("** test_get_sum(%d,%d): expect %d, but got %d\n", i, j, b, a);
-                  return false;
+      T rangeQuery_r (size_t node, size_t l, size_t r, size_t L, size_t R) const {
+          if (L <= l && R >= r) {
+              return C[node];
+          } else {
+              size_t mid = (l + r)/2;
+              if (f[node]) {
+                  C[node*2] = traits.update(C[node*2], f[node], mid - l + 1);
+                  f[node*2] += f[node];
+                  C[node*2+1] = traits.update(C[node*2+1], f[node], r - mid);
+                  f[node*2+1] += f[node];
+                  f[node] = 0;
+              }
+              T left = 0, right = 0;
+              bool hasLeft = false, hasRight = false;
+              if (L <= mid) {
+                  left = rangeQuery_r (node*2, l, mid, L, R);
+                  hasLeft = true;
+              }
+              if (R > mid) {
+                  right = rangeQuery_r (node*2+1, mid+1, r, L, R);
+                  hasRight = true;
+              }
+              if (hasLeft && hasRight) {
+                  return traits.combine(left, right);
+              } else if (hasLeft) {
+                  return traits.combineLeft (left);
+              } else {
+                  return traits.combineRight (right);
               }
           }
       }
-      printf ("test_get_sum() test ok\n");
-      return true;
-  }
-  
-  int main (int argc, char *argv[]) {
-      // 初始化线性表
-      numbers_init ();
-      // 初始化线段树
-      tree_init ();
-      // 在未做区间修改的情况下测试求和
-      test_get_sum ();
-      // 对区间做两次修改再测试求和
-      tree_inc (N_NUMBERS/4, N_NUMBERS/2, 37);
-      brute_force_inc (N_NUMBERS/4, N_NUMBERS/2, 37);
-      tree_inc (N_NUMBERS/6, N_NUMBERS * 5 / 8, -9);
-      brute_force_inc (N_NUMBERS/6, N_NUMBERS * 5 / 8, -9);
-      test_get_sum ();
-      
-      return 0;
-  }
+  };
+  #endif //__SEGMENT_TREE__
+
   ```
 
   
