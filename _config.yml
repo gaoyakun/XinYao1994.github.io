@@ -65,7 +65,11 @@ tag_dir: tag/
 # excerpt
 excerpt_separator: "\n\n\n\n"
 
-# paginate
-plugins: [jekyll-paginate]
+# plugins
+plugins: 
+  - jekyll-paginate
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
 paginate: 6
 port: 4001
